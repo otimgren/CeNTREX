@@ -21,7 +21,7 @@ units =
 label = Device enabled
 type = QCheckBox
 tristate = True
-row = 1
+row = 2
 col = 0
 tooltip = Whether or not device is enabled
 rowspan = None
@@ -31,7 +31,7 @@ value = 1
 [HDF_enabled]
 label = HDF enabled
 type = QCheckBox
-row = 1
+row = 2
 col = 1
 tooltip = Whether or not writing to HDF file
 rowspan = None
@@ -41,7 +41,7 @@ value = True
 [demo]
 label = Demo camera
 type = QCheckBox
-row = 1
+row = 2
 col = 2
 tooltip = Can use virtual camera for testing
 rowspan = None
@@ -51,7 +51,7 @@ value = True
 [dt]
 label = Loop delay [s]
 type = QLineEdit
-row = 2
+row = 3
 col = 1
 tooltip = None
 rowspan = None
@@ -62,7 +62,7 @@ enter_cmd = None
 [EM_gain]
 label = EM Gain
 type = QLineEdit
-row = 3
+row = 4
 col = 1
 tooltip = EM gain
 rowspan = None
@@ -73,7 +73,7 @@ enter_cmd = None
 [CCD_temp]
 label = CCD Temp set point
 type = QLineEdit
-row = 4
+row = 5
 col = 1
 tooltip = Temperature of camera CCD
 rowspan = None

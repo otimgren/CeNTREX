@@ -6,7 +6,7 @@ from picam import PICam
 
 # picam_types needed to convert settings to numerical values
 from picam.picam_types import PicamReadoutControlMode, PicamAdcQuality, PicamAdcAnalogGain, PicamTriggerDetermination
-from picam.picam_types import PicamTriggerResponse
+from picam.picam_types import PicamTriggerResponse, PicamTriggerSource
 
 # Error logging
 import logging
@@ -16,6 +16,9 @@ class PIProEM512Excelon:
         # Time offset is offset from UNIX time 
         # (allows use of single precision floats in data storage)
         self.time_offset = time_offset
+
+        # Store wether or not using a democamera
+        self.demo = demo
 
         # Initialize camera class and load the Picam.dll library
         self.cam = PICam()
@@ -49,7 +52,7 @@ class PIProEM512Excelon:
         # Set exposure time
         self.cam.setParameter("ExposureTime", 10) # Exposure time in ms
 
-        # Readout mode
+        # Readout mode (FullFrame mean camera read out one whole frame at a time)
         self.cam.setParameter("ReadoutControlMode", PicamReadoutControlMode["FullFrame"])
 
         # ADC parameters
@@ -65,9 +68,14 @@ class PIProEM512Excelon:
         self.cam.setParameter("CleanCycleHeight", 100)
         self.cam.setParameter("CleanUntilTrigger", True)
 
-        # Reaction to trigger
-        self.cam.setParameter("TriggerDetermination", PicamTriggerDetermination["RisingEdge"])
-        self.cam.setParameter("TriggerResponse", PicamTriggerResponse["ReadoutPerTrigger"])
+        # Reaction to external trigger
+        # if using a demo camera, don't want to wait for trigger
+        if demo:
+            self.cam.setParameter("TriggerResponse", PicamTriggerResponse["NoResponse"])
+        
+        else:            
+            self.cam.setParameter("TriggerDetermination", PicamTriggerDetermination["RisingEdge"])
+            self.cam.setParameter("TriggerResponse", PicamTriggerResponse["ReadoutPerTrigger"])
 
         # Apply settings
         self.cam.sendConfiguration()
@@ -76,7 +84,7 @@ class PIProEM512Excelon:
         # Output data params #
         ######################
         # Shape and type of output data
-        self.shape = (512,512)
+        self.shape = (1,512,512)
         self.dtype = np.int16
 
         # New attributes for HDF file
@@ -105,8 +113,13 @@ class PIProEM512Excelon:
         # Get timestamp
         timestamp = time.time()-self.time_offset
 
+        # Make list of dictionaries that contain attributes for the frame
+        all_attrs = []
+        attrs = {"timestamp":timestamp}
+        all_attrs.append(attrs)
+
         # Return the data and timestamp
-        return [data, timestamp]
+        return [data, all_attrs]
 
     def GetWarnings(self):
         return None
