@@ -1,0 +1,1 @@
+[["UV camera", "ReadValue", "", "1", "True", "5", []]]

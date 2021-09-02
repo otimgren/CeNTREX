@@ -33,7 +33,7 @@ config_dir = F:\Google Drive\CeNTREX Oskari\CeNTREX Data Acquisition\CeNTREX\con
 hdf_fname = F:\Google Drive\CeNTREX Oskari\CeNTREX Data Acquisition\CeNTREX\data\camera_test.hdf
 plotting_hdf_fname = F:\Google Drive\CeNTREX Oskari\CeNTREX Data Acquisition\CeNTREX\data\camera_test.hdf
 plotting_config_fname = F:\Google Drive\CeNTREX Oskari\CeNTREX Data Acquisition\CeNTREX\data\plot_config.pkl
-sequence_fname = F:\Google Drive\CeNTREX Oskari\CeNTREX Data Acquisition\CeNTREX\config\readout_rotcooling\scan R0 F1.txt
+sequence_fname = F:/Google Drive/CeNTREX Oskari/CeNTREX Data Acquisition/CeNTREX/config/camera_test/test.txt
 
 [influxdb]
 enabled = False
