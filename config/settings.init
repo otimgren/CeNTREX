@@ -1,0 +1,53 @@
+[general]
+default_plot_dt = 0.1
+default_hdf_dt = 0.1
+run_name = Q23 first try
+hdf_loop_delay = .5
+monitoring_dt = 1.0
+custom_command = 
+custom_device = PS350
+style = dark
+debug_level = WARNING
+
+[run_attributes]
+run_description = Test camera on Q23
+amplification = NA
+lowpass = NA
+det_power = 35 mW
+det_pol_freq = 1.56 MHz
+rc_power_after_eom = 0 mW
+rc_pol_freq = 0
+channels = yag, pmt, abs, absn, shutter, RC pd
+shutter_freq = 5 Hz
+microwave_power_horn_j12 = -100 dBm
+microwave_power_j23 = -100 dBm
+npasses = 15
+mu_pol_freq = 1 MHz
+yag qswitch = 130
+yag power = 48 mJ
+amplifier = NA
+npasses det = 1
+
+[files]
+config_dir = F:\Google Drive\CeNTREX Oskari\CeNTREX Data Acquisition\CeNTREX\config\camera_test
+hdf_fname = F:\Google Drive\CeNTREX Oskari\CeNTREX Data Acquisition\CeNTREX\data\camera_test.hdf
+plotting_hdf_fname = F:\Google Drive\CeNTREX Oskari\CeNTREX Data Acquisition\CeNTREX\data\camera_test.hdf
+plotting_config_fname = F:\Google Drive\CeNTREX Oskari\CeNTREX Data Acquisition\CeNTREX\data\plot_config.pkl
+sequence_fname = F:\Google Drive\CeNTREX Oskari\CeNTREX Data Acquisition\CeNTREX\config\readout_rotcooling\scan R0 F1.txt
+
+[influxdb]
+enabled = False
+host = 172.28.82.114
+port = 8086
+username = bsmonitor
+password = molecules
+database = beamsource
+
+[networking]
+enabled = False
+name = Readout
+port_readout = 123456
+port_control = 123457
+workers = 10
+allowed = 127.0.0.1
+

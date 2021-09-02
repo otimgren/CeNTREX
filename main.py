@@ -1215,11 +1215,11 @@ class ProgramConfig(Config):
         self.read_from_file()
 
     def define_permitted_keys(self):
-        # list of keys permitted for static options (those in the .ini file)
+        # list of keys permitted for static options (those in the .init file)
         self.static_keys = {
             }
 
-        # list of keys permitted for runtime data (which cannot be written to .ini file)
+        # list of keys permitted for runtime data (which cannot be written to .init file)
         self.runtime_keys = {
                 "time_offset"        : float,
                 "control_active"     : bool,
@@ -1230,7 +1230,7 @@ class ProgramConfig(Config):
                 "horizontal_split"   : bool,
             }
 
-        # list of keys permitted as names of sections in the .ini file
+        # list of keys permitted as names of sections in the .init file
         self.section_keys = {
                 "general"        : dict,
                 "run_attributes" : dict,
@@ -1250,7 +1250,7 @@ class ProgramConfig(Config):
 
     def read_from_file(self):
         settings = configparser.ConfigParser()
-        settings.read("config/settings.ini")
+        settings.read("config/settings.init")
         for section, section_type in self.section_keys.items():
             self[section] = settings[section]
 
@@ -1261,7 +1261,7 @@ class ProgramConfig(Config):
             config[sect] = self[sect]
 
         # write them to file
-        with open("config/settings.ini", 'w') as f:
+        with open("config/settings.init", 'w') as f:
             config.write(f)
 
     def change(self, sect, key, val, typ=str):
@@ -1280,7 +1280,7 @@ class DeviceConfig(Config):
         self.read_from_file()
 
     def define_permitted_keys(self):
-        # list of keys permitted for static options (those in the .ini file)
+        # list of keys permitted for static options (those in the .init file)
         self.static_keys = {
                 "name"               : str,
                 "label"              : str,
@@ -1302,7 +1302,7 @@ class DeviceConfig(Config):
                 "plots_fn"           : str,
             }
 
-        # list of keys permitted for runtime data (which cannot be written to .ini file)
+        # list of keys permitted for runtime data (which cannot be written to .init file)
         self.runtime_keys = {
                 "parent"                  : CentrexGUI,
                 "driver_class"            : None,
@@ -1315,7 +1315,7 @@ class DeviceConfig(Config):
                 "control_active"          : bool,
             }
 
-        # list of keys permitted as names of sections in the .ini file
+        # list of keys permitted as names of sections in the .init file
         self.section_keys = {
                 "attributes"     : dict,
                 "control_params" : dict,
@@ -1347,20 +1347,20 @@ class DeviceConfig(Config):
         params = configparser.ConfigParser()
         params.read(self.fname)
         if not "device" in params:
-            if self.fname[-11:] != "desktop.ini":
+            if self.fname[-11:] != "desktop.init":
                 logging.warning("The device config file " + self.fname + " does not have a [device] section.")
             return
 
         # read general device options
         for key, typ in self.static_keys.items():
-            # read a parameter from the .ini file
+            # read a parameter from the .init file
             val = params["device"].get(key)
 
             # check the parameter is defined in the file; leave it at its default value if not
             if not val:
                 continue
 
-            # if the parameter is defined in the .init file, parse it into correct type:
+            # if the parameter is defined in the .initt file, parse it into correct type:
             if typ == list:
                 self[key] = [x.strip() for x in val.split(",")]
             elif typ == bool:
@@ -1668,7 +1668,7 @@ class PlotConfig(Config):
                 "animation_running" : bool,
             }
 
-        # list of keys permitted as names of sections in the .ini file
+        # list of keys permitted as names of sections in the .init file
         self.section_keys = {
             }
 
@@ -1776,7 +1776,7 @@ class AttrEditor(QtGui.QDialog):
             params.read(self.dev.config.fname)
             new_attrs = params["attributes"]
         else:
-            params.read("config/settings.ini")
+            params.read("config/settings.init")
             new_attrs = params["run_attributes"]
 
         # rewrite the table contents
@@ -2052,7 +2052,7 @@ class ControlGUI(qt.QWidget):
             return
 
         # iterate over all device config files
-        for fname in glob.glob(self.parent.config["files"]["config_dir"] + "/*.ini"):
+        for fname in glob.glob(self.parent.config["files"]["config_dir"] + "/*.init"):
             # read device configuration
             try:
                 dev_config = DeviceConfig(fname)
@@ -2153,7 +2153,7 @@ class ControlGUI(qt.QWidget):
         files_frame.addWidget(qt.QLabel("Config dir:"), 0, 0)
 
         self.config_dir_qle = qt.QLineEdit()
-        self.config_dir_qle.setToolTip("Directory with .ini files with device configurations.")
+        self.config_dir_qle.setToolTip("Directory with .init files with device configurations.")
         self.config_dir_qle.setText(self.parent.config["files"]["config_dir"])
         self.config_dir_qle.textChanged[str].connect(lambda val: self.parent.config.change("files", "config_dir", val))
         files_frame.addWidget(self.config_dir_qle, 0, 1)
@@ -4186,7 +4186,7 @@ class CentrexGUI(qt.QMainWindow):
         self.load_stylesheet()
 
         # read program configuration
-        self.config = ProgramConfig("config/settings.ini")
+        self.config = ProgramConfig("config/settings.init")
 
         # set debug level
         logging.getLogger().setLevel(self.config["general"]["debug_level"])

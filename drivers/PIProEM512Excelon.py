@@ -12,12 +12,13 @@ from picam.picam_types import PicamTriggerResponse
 import logging
 
 class PIProEM512Excelon:
-    def __init__(self, time_offset) -> None:
+    def __init__(self, time_offset, demo = False) -> None:
         # Time offset is offset from UNIX time 
         # (allows use of single precision floats in data storage)
         self.time_offset = time_offset
 
         # Initialize camera class and load the Picam.dll library
+        self.cam = PICam()
         self.cam.loadLibrary()
 
         #####################
@@ -25,7 +26,7 @@ class PIProEM512Excelon:
         #####################
         try:
             # Find available cameras
-            self.cam.getAvailableCameras()
+            self.cam.getAvailableCameras(demo = demo)
 
             # Connect to camera ("camID = None" means connect to first camera found)
             self.cam.connect(camID = None)
@@ -74,8 +75,14 @@ class PIProEM512Excelon:
         ######################
         # Output data params #
         ######################
+        # Shape and type of output data
         self.shape = (512,512)
         self.dtype = np.int16
+
+        # New attributes for HDF file
+        self.new_attributes = []
+
+
 
     ###########################
     # Methods for python with #
