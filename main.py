@@ -1624,7 +1624,7 @@ class DeviceConfig(Config):
                 config[c_name]["monitoring_command"] = str(c.get("monitoring_command"))
                 config[c_name]["action_commands"] = ", ".join(c["action_commands"])
                 config[c_name]["return_values"] = ", ".join(c["return_values"])
-                config[c_name]["checked"] = ", ".join([str(x) for s in c["checked"]])
+                config[c_name]["checked"] = ", ".join([str(s) for s in c["checked"]])
                 config[c_name]["states"] = ", ".join(c["states"])
                 config[c_name]["texts"] = ", ".join(c["texts"])
                 config[c_name]["argument"] = str(c.get("argument"))
