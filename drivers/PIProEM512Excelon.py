@@ -6,18 +6,22 @@ from picam import PICam
 
 # picam_types needed to convert settings to numerical values
 from picam.picam_types import PicamReadoutControlMode, PicamAdcQuality, PicamAdcAnalogGain, PicamTriggerDetermination
-from picam.picam_types import PicamTriggerResponse, PicamTriggerSource
+from picam.picam_types import PicamTriggerResponse
 
 # Error logging
 import logging
 
 class PIProEM512Excelon:
-    def __init__(self, time_offset, demo = False) -> None:
+    def __init__(self, time_offset, exposure_time, EM_gain, analog_gain, CCD_temp, demo = False, ) -> None:
         # Time offset is offset from UNIX time 
         # (allows use of single precision floats in data storage)
         self.time_offset = time_offset
 
-        # Store wether or not using a democamera
+        # Store parameters
+        self.exposure_time = exposure_time
+        self.EM_gain = EM_gain
+        self.analog_gain = analog_gain
+        self.CCD_temp = CCD_temp
         self.demo = demo
 
         # Initialize camera class and load the Picam.dll library
@@ -47,18 +51,18 @@ class PIProEM512Excelon:
         # Set camera params #
         #####################
         # Camera temperature
-        self.cam.setParameter("SensorTemperatureSetPoint", -70)
+        self.cam.setParameter("SensorTemperatureSetPoint", float(CCD_temp))
 
         # Set exposure time
-        self.cam.setParameter("ExposureTime", 10) # Exposure time in ms
+        self.cam.setParameter("ExposureTime", float(exposure_time)) # Exposure time in ms
 
         # Readout mode (FullFrame mean camera read out one whole frame at a time)
         self.cam.setParameter("ReadoutControlMode", PicamReadoutControlMode["FullFrame"])
 
         # ADC parameters
         self.cam.setParameter("AdcQuality", PicamAdcQuality["ElectronMultiplied"])
-        self.cam.setParameter("AdcAnalogGain", PicamAdcAnalogGain["Low"])
-        self.cam.setParameter("AdcEMGain", 1)
+        self.cam.setParameter("AdcAnalogGain", PicamAdcAnalogGain[analog_gain])
+        self.cam.setParameter("AdcEMGain", int(EM_gain))
 
         # sensor cleaning
         self.cam.setParameter("CleanSectionFinalHeightCount", 1)
@@ -110,12 +114,19 @@ class PIProEM512Excelon:
         # Read one frame from camera
         data = self.cam.readNFrames(N = 1, timeout = 100000)[0].reshape(self.shape)
 
+        # If using a demo camera, add some random noise
+        if self.demo:
+            noise = np.random.rand(*data.shape)*data.mean()/3
+            data += noise
+
         # Get timestamp
         timestamp = time.time()-self.time_offset
 
         # Make list of dictionaries that contain attributes for the frame
         all_attrs = []
-        attrs = {"timestamp":timestamp}
+        attrs = {"timestamp":timestamp, "exposure_time": self.exposure_time, "EM_gain": self.EM_gain,
+                 "analog_gain":self.analog_gain, "CCD_temp": self.CCD_temp
+                 }
         all_attrs.append(attrs)
 
         # Return the data and timestamp
