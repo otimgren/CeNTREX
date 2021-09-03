@@ -170,7 +170,14 @@ class HistogramPlotter:
         col_names1 = split(self.parent.devices[self.dev1].config["attributes"]["column_names"])
         col_names2 = split(self.parent.devices[self.dev2].config["attributes"]["column_names"])
         try:
-            param1_dset = data1[0][0, col_names1.index(self.param1)].astype(float)
+            # If no parameter specified, return all columns
+            if self.param1 == "All":
+                param1_dset = data1[0][0, :].astype(float)
+
+            # Otherwise return specified column
+            else:
+                param1_dset = data1[0][0, col_names1.index(self.param1)].astype(float)
+
         except IndexError:
             logging.error("Error in HistogramPlotter: param not found: " + self.param1)
             return
