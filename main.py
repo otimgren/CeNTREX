@@ -3506,6 +3506,7 @@ class Plotter(qt.QWidget):
 
         self.plot = None
         self.curve = None
+        self.bar = None
         self.fast_y = []
 
         self.config = PlotConfig()
@@ -3844,7 +3845,11 @@ class Plotter(qt.QWidget):
                     logging.warning("Plot error: y not valid.")
                     logging.warning("Plot warning: bad parameters")
                     return None
-                y = dset[:, self.param_list.index(self.config["y"])].astype(np.float)
+                # If dealing with 2D data (e.g. camera) get all columns as y data
+                elif self.config["y"] == "2D":
+                    y = dset[0][0, :].astype(float)
+                else:
+                    y = dset[:, self.param_list.index(self.config["y"])].astype(np.float)
 
                 # divide y by z (if applicable)
                 if self.config["z"] in self.param_list:
@@ -3903,7 +3908,11 @@ class Plotter(qt.QWidget):
                 logging.warning("Plot error: y not valid.")
                 logging.warning("Plot warning: bad parameters")
                 return None
-            y = dset[0][0, self.param_list.index(self.config["y"])].astype(float)
+            # If dealing with 2D data (e.g. camera) get all columns as y data
+            elif self.config["y"] == "2D":
+                y = dset[0][0, :].astype(float)
+            else:
+                y = dset[0][0, self.param_list.index(self.config["y"])].astype(float)
             self.dset_attrs = dset[1]
 
             # divide y by z (if applicable)
@@ -3928,7 +3937,12 @@ class Plotter(qt.QWidget):
                     logging.warning("Plot averaging error: " + str(err))
                     logging.warning(traceback.format_exc())
                     break
-                y_avg += dset[0][0, self.param_list.index(self.config["y"])]
+                # Check if 2D or not
+                if self.config["y"] == "2D":
+                    y_avg += dset[0][0, :]
+                else:
+                    y_avg += dset[0][0, self.param_list.index(self.config["y"])]
+
             if self.config["n_average"] > 0:
                 y = y_avg / self.config["n_average"]
 
@@ -3965,7 +3979,7 @@ class Plotter(qt.QWidget):
             x0, x1 = 0, len(x)
 
         # verify data shape
-        if not x.shape == y.shape:
+        if not ((x.shape == y.shape) or (self.config["y"] == "2D")):
             logging.warning("Plot error: data shapes not matching: " +
                     str(x.shape) + " != " + str(y.shape))
             return None
@@ -3997,7 +4011,7 @@ class Plotter(qt.QWidget):
             try:
                 y_fn = eval(self.config["f(y)"])
                 # case (a)
-                if x.shape == y_fn.shape:
+                if (x.shape == y_fn.shape) or (self.config["y"] == "2D" and y.shape == y_fn.shape):
                     return x[x0:x1], y_fn[x0:x1]
 
                 # case (b)
@@ -4025,31 +4039,59 @@ class Plotter(qt.QWidget):
             return
 
         # plot data
-        if not self.plot:
-            self.plot = pg.PlotWidget()
-            self.plot.showGrid(True, True)
-            self.f.addWidget(self.plot)
-        if not self.curve:
-            self.curve = self.plot.plot(*data, symbol=self.config["symbol"])
-            self.update_labels()
+        # Check if making a 2D plot
+        if self.config["y"] == "2D":
+            if not self.plot:
+                self.plot = pg.PlotWidget()
+                self.f.addWidget(self.plot)
+            if not self.curve:
+                self.curve = pg.ImageItem()
+                #self.bar = pg.ColorBarItem()
+                self.plot.addItem(self.curve)
+                self.curve.setImage(image = data[1])
+                #self.bar.setImageItem(self.curve, insert_in=self.plot) 
+                self.update_labels()
+            else:
+                self.curve.setImage(image = data[1])
+                # self.bar.setImageItem(self.curve, insert_in=self.plot) 
         else:
-            self.curve.setData(*data)
+            if not self.plot:
+                self.plot = pg.PlotWidget()
+                self.plot.showGrid(True, True)
+                self.f.addWidget(self.plot)
+            if not self.curve:
+                self.curve = self.plot.plot(*data, symbol=self.config["symbol"])
+                self.update_labels()
+            else:
+                self.curve.setData(*data)
 
     def update_labels(self):
         if self.plot:
-            # get units
-            col_names = split(self.dev.config["attributes"]["column_names"])
-            units     = split(self.dev.config["attributes"]["units"])
-            try:
-                x_unit = " [" + units[col_names.index(self.config["x"])] + "]"
-                y_unit = " [" + units[col_names.index(self.config["y"])] + "]"
-            except ValueError:
-                logging.info(traceback.format_exc())
-                x_unit, y_unit = "", ""
+            if self.config["y"] == "2D":
+                # Get units 
+                col_names = split(self.dev.config["attributes"]["column_names"])
+                units     = split(self.dev.config["attributes"]["units"])
+                try:
+                    x_unit = " [" + units[1] + "]"
+                    y_unit = " [" + units[1] + "]"
+                except ValueError:
+                    logging.info(traceback.format_exc())
+                    x_unit, y_unit = "", ""
+            
+            else:
+                # get units
+                col_names = split(self.dev.config["attributes"]["column_names"])
+                units     = split(self.dev.config["attributes"]["units"])
+                try:
+                    x_unit = " [" + units[col_names.index(self.config["x"])] + "]"
+                    y_unit = " [" + units[col_names.index(self.config["y"])] + "]"
+                except ValueError:
+                    logging.info(traceback.format_exc())
+                    x_unit, y_unit = "", ""
 
-            # set axis labels
-            self.plot.setLabel("bottom", self.config["x"]+x_unit)
-            self.plot.setLabel("left", self.config["y"]+y_unit)
+                # set axis labels
+                self.plot.setLabel("bottom", self.config["x"]+x_unit)
+                self.plot.setLabel("left", self.config["y"]+y_unit)
 
             # set plot title
             title = self.config["device"] + "; " + self.config["run"]
