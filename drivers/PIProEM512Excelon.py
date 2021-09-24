@@ -63,6 +63,7 @@ class PIProEM512Excelon:
         self.cam.setParameter("AdcQuality", PicamAdcQuality["ElectronMultiplied"])
         self.cam.setParameter("AdcAnalogGain", PicamAdcAnalogGain[analog_gain])
         self.cam.setParameter("AdcEMGain", int(EM_gain))
+        self.cam.setParameter("AdcSpeed", 5.0)
 
         # sensor cleaning
         self.cam.setParameter("CleanSectionFinalHeightCount", 1)
@@ -112,7 +113,7 @@ class PIProEM512Excelon:
     ############################
     def ReadValue(self):
         # Read one frame from camera
-        data = self.cam.readNFrames(N = 1, timeout = 100000)[0].reshape(self.shape)
+        data = self.cam.readNFrames(N = 1, timeout = 6000)[0].reshape(self.shape)
 
         # If using a demo camera, add some random noise
         if self.demo:
