@@ -319,12 +319,13 @@ class ZaberTMM:
         elif dev1_axis == 'y':
             self.devx = 2
             self.devy = 1
+        
 
-        if not self.ReadDeviceModeX()[7]:
+        if not self.ReadDeviceModeX()[7]: # USED TO BE 7, NOW SET TO 3
             warning = 'Home Status bit not set in Dev{0}, home device'.format(self.devx)
             logging.warning('ZaberTMM warning: '+warning)
             self.CreateWarning(warning)
-        if not self.ReadDeviceModeY()[7]:
+        if not self.ReadDeviceModeY()[7]: # USED TO BE 7, NOW SET TO 3
             warning = 'Home Status bit not set in Dev{0}, home device'.format(self.devx)
             logging.warning('ZaberTMM warning: '+warning)
             self.CreateWarning(warning)

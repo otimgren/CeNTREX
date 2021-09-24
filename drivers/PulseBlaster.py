@@ -296,7 +296,7 @@ if __name__ == "__main__":
     #            'active_high':True}
     flashlamp = {'frequency':50, 'offset':0, 'high': int(1e6), 'channels':[1],
                  'active_high':True}
-    qswitch = {'frequency':10, 'offset':int(qswitch_delay*1e3), 'high': int(1e6), 'channels':[2],
+    qswitch = {'frequency':2.5, 'offset':int(qswitch_delay*1e3), 'high': int(1e6), 'channels':[2],
                'active_high':True}
     # trigger = {'frequency':20, 'offset':int(qswitch_delay*1e3), 'high': int(1e6), 'channels':[5]}
     shutter = {'frequency':5, 'offset':int(qswitch_delay*1e3)+int(70e-3/1e-9)+1, 'high': int(100e-3/1e-9), 'channels':[3,4],

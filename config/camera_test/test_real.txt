@@ -1,1 +1,1 @@
-[["YagIsolator", "SetNrQswitchesGUI", "10", "", "", "", []], ["UV camera", "ReadValue", "", "", "True", "5", []]]
+[["YagIsolator", "SetNrQswitchesGUI", "10", "", "", "", []], ["UV camera", "ReadValue", "", "", "True", "5", [["DummyDataFreq", "ReadValue", "", "", "", "", []]]], ["", "", "", "", "", "", []]]

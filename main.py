@@ -2069,8 +2069,6 @@ class ControlGUI(qt.QWidget):
                 logging.error(traceback.format_exc())
                 return
 
-            print(fname)
-
             # for meta devices, include a reference to the parent
             if dev_config["meta_device"]:
                 dev_config["parent"] = self.parent

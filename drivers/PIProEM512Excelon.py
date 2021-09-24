@@ -112,7 +112,7 @@ class PIProEM512Excelon:
     ############################
     def ReadValue(self):
         # Read one frame from camera
-        data = self.cam.readNFrames(N = 1, timeout = 100000)[0].reshape(self.shape)
+        data = self.cam.readNFrames(N = 1, timeout = 6000)[0].reshape(self.shape)
 
         # If using a demo camera, add some random noise
         if self.demo:
