@@ -56,8 +56,12 @@ class PIProEM512Excelon:
         # Set exposure time
         self.cam.setParameter("ExposureTime", float(exposure_time)) # Exposure time in ms
 
-        # Readout mode (FullFrame mean camera read out one whole frame at a time)
+        # Readout mode (FullFrame mean camera reads out one whole frame at a time)
         self.cam.setParameter("ReadoutControlMode", PicamReadoutControlMode["FullFrame"])
+
+        # Set region of interest (x, width, x_binning, y, height, y_binning)
+        # x = coordinate of first column, y = coordinate of first row
+        self.cam.setROI(0, 512, 1, 0, 512, 1)
 
         # ADC parameters
         self.cam.setParameter("AdcQuality", PicamAdcQuality["ElectronMultiplied"])
