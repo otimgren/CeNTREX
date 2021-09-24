@@ -63,6 +63,7 @@ class PIProEM512Excelon:
         self.cam.setParameter("AdcQuality", PicamAdcQuality["ElectronMultiplied"])
         self.cam.setParameter("AdcAnalogGain", PicamAdcAnalogGain[analog_gain])
         self.cam.setParameter("AdcEMGain", int(EM_gain))
+        self.cam.setParameter("AdcSpeed", 5.0)
 
         # sensor cleaning
         self.cam.setParameter("CleanSectionFinalHeightCount", 1)
