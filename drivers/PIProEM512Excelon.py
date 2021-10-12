@@ -148,3 +148,6 @@ class PIProEM512Excelon:
 
     def GetWarnings(self):
         return None
+
+    def GetTemperatureStatus(self):
+        return self.cam.getParameter("PicamSensorTemperatureStatus")
