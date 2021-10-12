@@ -72,10 +72,12 @@ class YagIsolator:
     #################################################################
     def DisableQswitchGUI(self):
         self.Disable('D')
+        self.Disable('A')
         self.qswitch_status = bool(self.instr.query("status D"))
 
     def EnableQswitchGUI(self):
         self.Enable('D')
+        self.Enable('A')
         self.qswitch_status = bool(self.instr.query("status D"))
 
     def QswitchStatusGUI(self):
@@ -114,14 +116,14 @@ class YagIsolator:
             logging.warning("YagIsolator warning in QswitchCounter(): "+ret)
 
     def Enable(self, channel):
-        assert channel in ['C', 'D'], f'invalid channel : {channel}'
+        assert channel in ['C', 'D', 'A'], f'invalid channel : {channel}'
         cmd = f'enable {channel}'
         ret = self.instr.query(cmd)
         if ret != cmd:
             logging.warning("YagIsolator warning in Enable(): "+ret)
 
     def Disable(self, channel):
-        assert channel in ['C', 'D'], f'invalid channel : {channel}'
+        assert channel in ['C', 'D', 'A'], f'invalid channel : {channel}'
         cmd = f'disable {channel}'
         ret = self.instr.query(cmd)
         if ret != cmd:

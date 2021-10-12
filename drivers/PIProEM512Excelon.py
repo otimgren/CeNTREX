@@ -12,7 +12,8 @@ from picam.picam_types import PicamTriggerResponse
 import logging
 
 class PIProEM512Excelon:
-    def __init__(self, time_offset, exposure_time, EM_gain, analog_gain, CCD_temp, demo = False, ) -> None:
+    def __init__(self, time_offset, exposure_time, EM_gain, analog_gain, CCD_temp, trigger_response, x0, x1, y0, y1,
+                demo = False, ) -> None:
         # Time offset is offset from UNIX time 
         # (allows use of single precision floats in data storage)
         self.time_offset = time_offset
@@ -23,6 +24,10 @@ class PIProEM512Excelon:
         self.analog_gain = analog_gain
         self.CCD_temp = CCD_temp
         self.demo = demo
+        self.x0 = int(x0)
+        self.x1 = int(x1)
+        self.y0 = int(y0)
+        self.y1 = int(y1)
 
         # Initialize camera class and load the Picam.dll library
         self.cam = PICam()
@@ -61,7 +66,7 @@ class PIProEM512Excelon:
 
         # Set region of interest (x, width, x_binning, y, height, y_binning)
         # x = coordinate of first column, y = coordinate of first row
-        self.cam.setROI(0, 512, 1, 0, 512, 1)
+        self.cam.setROI(int(x0), int(x1)-int(x0), 1, int(y0), int(y1)-int(y0), 1)
 
         # ADC parameters
         self.cam.setParameter("AdcQuality", PicamAdcQuality["ElectronMultiplied"])
@@ -71,10 +76,10 @@ class PIProEM512Excelon:
 
         # sensor cleaning
         self.cam.setParameter("CleanSectionFinalHeightCount", 1)
-        self.cam.setParameter("CleanSectionFinalHeight", 100)
+        self.cam.setParameter("CleanSectionFinalHeight", 512)
         self.cam.setParameter("CleanSerialRegister", False)
         self.cam.setParameter("CleanCycleCount", 1)
-        self.cam.setParameter("CleanCycleHeight", 100)
+        self.cam.setParameter("CleanCycleHeight", 512)
         self.cam.setParameter("CleanUntilTrigger", True)
 
         # Reaction to external trigger
@@ -84,7 +89,7 @@ class PIProEM512Excelon:
         
         else:            
             self.cam.setParameter("TriggerDetermination", PicamTriggerDetermination["RisingEdge"])
-            self.cam.setParameter("TriggerResponse", PicamTriggerResponse["ReadoutPerTrigger"])
+            self.cam.setParameter("TriggerResponse", PicamTriggerResponse[trigger_response])
 
         # Apply settings
         self.cam.sendConfiguration()
@@ -93,7 +98,7 @@ class PIProEM512Excelon:
         # Output data params #
         ######################
         # Shape and type of output data
-        self.shape = (1,512,512)
+        self.shape = (1,self.x1-self.x0,self.y1-self.y0)
         self.dtype = np.int16
 
         # New attributes for HDF file
@@ -117,7 +122,11 @@ class PIProEM512Excelon:
     ############################
     def ReadValue(self):
         # Read one frame from camera
-        data = self.cam.readNFrames(N = 1, timeout = 6000)[0].reshape(self.shape)
+        try:
+            data = self.cam.readNFrames(N = 1, timeout = 1000)[0].reshape(self.shape)
+        except IndexError:
+            print("Camera missed trigger")
+            data = np.ones(self.shape)*np.nan
 
         # If using a demo camera, add some random noise
         if self.demo:

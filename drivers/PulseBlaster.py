@@ -299,7 +299,13 @@ if __name__ == "__main__":
     qswitch = {'frequency':2.5, 'offset':int(qswitch_delay*1e3), 'high': int(1e6), 'channels':[2],
                'active_high':True}
     # trigger = {'frequency':20, 'offset':int(qswitch_delay*1e3), 'high': int(1e6), 'channels':[5]}
-    shutter = {'frequency':5, 'offset':int(qswitch_delay*1e3)+int(70e-3/1e-9)+1, 'high': int(100e-3/1e-9), 'channels':[3,4],
+    shutter = {'frequency':1.25, 'offset':int(qswitch_delay*1e3)+int(380e-3/1e-9)+1, 'high': int(100e-3/1e-9), 'channels':[3,4],
+               'active_high':True}
+
+    # Set up trigger that tells the camera when to expose
+    camera_delay = 2e6 # Delay between Q-switch and camera starting acquisition in ns
+    camera_expose = 10e6 # Camera exposure time in ns
+    camera_trigger = {'frequency':2.5, 'offset':int(camera_delay), 'high': int(camera_expose+qswitch_delay*1e3), 'channels':[0],
                'active_high':True}
 
     fpol = 1.5e6
@@ -317,5 +323,5 @@ if __name__ == "__main__":
     # shutter_daq = {'frequency': 5/20,'offset':int(round(20e-3/1e-9,2)), 'high':int(round(2/1e-9,2)), 'channels':[4],
     #            'active_high':True}
 
-    t, c, sequence = generate_repeating_pulses([flashlamp, qswitch, shutter], [])
+    t, c, sequence = generate_repeating_pulses([flashlamp, qswitch, shutter, camera_trigger], [])
     pb = PulseBlaster(time.time(), 0, {}, sequence)
